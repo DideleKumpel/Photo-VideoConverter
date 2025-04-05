@@ -6,7 +6,51 @@
              xmlns:local="clr-namespace:Photo_VideoConverter.View"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="30*"/>
+            <RowDefinition Height="40*"/>
+            <RowDefinition Height="20*"/>
+        </Grid.RowDefinitions>
+        <Border BorderBrush="Black" BorderThickness="1">
+            <Grid>
+            <Button Width="100" Height="35" HorizontalAlignment="Left" Margin="10,0,0,0"> Back to menu</Button>
+            <Label FontSize="28" HorizontalAlignment="Center">CONVERT SETTINGS</Label>
+            </Grid>
+        </Border>
+        <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1">
+            <StackPanel Margin="10">
+                <Label FontSize="16">Input settings:</Label>
+                <Button Width="150" Height="40" HorizontalAlignment="Left">Chosse input folder</Button>
+                <TextBlock FontSize="13" Margin="0,5,0,5">Input folder path:</TextBlock>
+                <TextBlock FontSize="13" Text="*Path here*" />
+            </StackPanel>
+        </Border>
+        <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1">
+            <Grid Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20*"/>
+                    <RowDefinition Height="80*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50*"/>
+                    <ColumnDefinition Width="50*"/>
+                </Grid.ColumnDefinitions>
+                <Label FontSize="16">Output settings:</Label>
+                <StackPanel Grid.Row="1" Margin="5">
+                    <Button Width="150" Height="40" HorizontalAlignment="Left">Chosse output folder</Button>
+                    <TextBlock FontSize="13" Margin="0,5,0,5">Output folder path:</TextBlock>
+                    <TextBlock FontSize="12" Text="*Path here*" TextWrapping="Wrap"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="1" Margin="5">
+                    <Label FontSize="12">Output video format:</Label>
+                    <ComboBox></ComboBox>
+                    <Label FontSize="12">Output photo format:</Label>
+                    <ComboBox></ComboBox>
+                </StackPanel>
+            </Grid>
+        </Border>
+        <Button Grid.Row="3" Width="150" Height="40" HorizontalAlignment="Center" Margin="10,0,0,0">Start converting</Button>
     </Grid>
 </UserControl>
