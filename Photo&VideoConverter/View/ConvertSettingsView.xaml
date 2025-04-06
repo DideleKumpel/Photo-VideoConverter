@@ -39,7 +39,7 @@
                 </Grid.ColumnDefinitions>
                 <Label FontSize="16">Output settings:</Label>
                 <StackPanel Grid.Row="1" Margin="5">
-                    <Button Width="150" Height="40" HorizontalAlignment="Left" Command="{Binding ChoseInputFolderCommand}">Chosse output folder</Button>
+                    <Button Width="150" Height="40" HorizontalAlignment="Left" Command="{Binding ChoseOutputFolderCommand}">Chosse output folder</Button>
                     <TextBlock FontSize="13" Margin="0,5,0,5">Output folder path:</TextBlock>
                     <TextBlock FontSize="12" Text="{Binding OutputPath}" TextWrapping="Wrap"/>
                 </StackPanel>
@@ -52,7 +52,7 @@
             </Grid>
         </Border>
         <StackPanel Grid.Row="3" Orientation="Horizontal">
-            <Button  Width="150" Height="40" Margin="10,0,10,0">Start converting</Button>
+            <Button  Width="150" Height="40" Margin="10,0,10,0" Command="{Binding ConvertCommand}">Start converting</Button>
             <Border Width="300" Margin="15" BorderThickness="1" BorderBrush="Red" Visibility="{Binding ErrorMessageVisibility}">
                 <TextBlock Foreground="Red" Margin="5" Text="{Binding ErrorMessage}"/>
             </Border>

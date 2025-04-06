@@ -24,6 +24,7 @@ namespace Photo_VideoConverter.ViewModel
             set {
                 _selcetedVideFormat = value;
                 OnPropertyChanged(nameof(SelectedVideoFormat));
+                ConvertCommand.NotifyCanExecuteChanged();
             }
         }
         private string _selcetedImagineFormat;
@@ -33,6 +34,7 @@ namespace Photo_VideoConverter.ViewModel
             {
                 _selcetedImagineFormat = value;
                 OnPropertyChanged(nameof(_selcetedImagineFormat));
+                ConvertCommand.NotifyCanExecuteChanged();
             }
         }
 
@@ -57,7 +59,7 @@ namespace Photo_VideoConverter.ViewModel
 
             ChoseInputFolderCommand = new RelayCommand(ChoseInputFolder);
             ChoseOutputFolderCommand = new RelayCommand(ChoseOutputFolder);
-            ConvertCommand = new RelayCommand(SwitchToMenu);
+            ConvertCommand = new RelayCommand(SwitchToMenu, CanStartConvertion);
             SwitchToMenuCommand = new RelayCommand(SwitchToMenu);
         }
 
@@ -68,6 +70,7 @@ namespace Photo_VideoConverter.ViewModel
             {
                 InputPath = folderDialog.FolderName;
                 OnPropertyChanged(nameof(InputPath));
+                ConvertCommand.NotifyCanExecuteChanged();
             }
         }
 
@@ -78,6 +81,7 @@ namespace Photo_VideoConverter.ViewModel
             {
                 OutputPath = folderDialog.FolderName;
                 OnPropertyChanged(nameof(OutputPath));
+                ConvertCommand.NotifyCanExecuteChanged();
             }
         }
 
@@ -88,7 +92,80 @@ namespace Photo_VideoConverter.ViewModel
 
         private bool CanStartConvertion()
         {
-            return false;
+            bool CanConvert = true;
+            string Errors = null;
+            if (InputPath == null || InputPath == "none")
+            {
+                CanConvert = false;
+                if (string.IsNullOrEmpty(Errors))
+                {
+                    Errors = "Chose input folder.";
+                }
+                else
+                {
+                    Errors += "\n Chose input folder.";
+                }
+            }
+            if (OutputPath == null || OutputPath == "none")
+            {
+                CanConvert = false;
+                if (string.IsNullOrEmpty(Errors))
+                {
+                    Errors = "Chose output folder.";
+                }
+                else
+                {
+                    Errors += "\n Chose output folder.";
+                }
+            }
+            if (CanConvert == true && InputPath == OutputPath)
+            {
+                CanConvert = false;
+                if (string.IsNullOrEmpty(Errors))
+                {
+                    Errors = "Input and output folders can't be the same.";
+                }
+                else
+                {
+                    Errors += "\n Input and output folders can't be the same.";
+                }
+            }
+            if (SelectedVideoFormat == null)
+            {
+                CanConvert = false;
+                if (string.IsNullOrEmpty(Errors))
+                {
+                    Errors = "Chose output video format.";
+                }
+                else
+                {
+                    Errors += "\n Chose output video format.";
+                }
+            }
+            if (SelectedImageFormat == null) {
+                CanConvert = false;
+                if (string.IsNullOrEmpty(Errors))
+                {
+                    Errors = "Chose output imagine format.";
+                }
+                else
+                {
+                    Errors += "\n Chose output imagine format.";
+                }
+            }
+            if (!CanConvert)
+            {
+                ErrorMessage = Errors;
+                ErrorMessageVisibility = "Visible";
+            }
+            else
+            {
+                ErrorMessage = "";
+                ErrorMessageVisibility = "Collapsed";
+            }
+            OnPropertyChanged(nameof(ErrorMessage));
+            OnPropertyChanged(nameof(ErrorMessageVisibility));
+            return CanConvert;
         }
 
         private void SwitchToMenu()
