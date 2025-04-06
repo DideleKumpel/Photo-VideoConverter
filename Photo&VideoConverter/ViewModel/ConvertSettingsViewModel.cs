@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Photo_VideoConverter.Model;
 
 namespace Photo_VideoConverter.ViewModel
 {
@@ -59,7 +60,7 @@ namespace Photo_VideoConverter.ViewModel
 
             ChoseInputFolderCommand = new RelayCommand(ChoseInputFolder);
             ChoseOutputFolderCommand = new RelayCommand(ChoseOutputFolder);
-            ConvertCommand = new RelayCommand(SwitchToMenu, CanStartConvertion);
+            ConvertCommand = new RelayCommand(StartConvertion, CanStartConvertion);
             SwitchToMenuCommand = new RelayCommand(SwitchToMenu);
         }
 
@@ -87,7 +88,15 @@ namespace Photo_VideoConverter.ViewModel
 
         private void StartConvertion()
         {
-            //toDo
+            ConverterSettingsModel setting = new ConverterSettingsModel {
+                InputPath = this.InputPath,
+                OutputPath = this.OutputPath,
+                OutputImageFormat = _selcetedImagineFormat,
+                OutputVideoFormat = _selcetedVideFormat
+            };
+
+            ConvertStatusViewModel ViewModel = new ConvertStatusViewModel(setting);
+            Application.Current.MainWindow.DataContext = ViewModel;
         }
 
         private bool CanStartConvertion()
