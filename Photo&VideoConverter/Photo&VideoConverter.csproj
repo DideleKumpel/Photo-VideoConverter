@@ -15,4 +15,8 @@
     <PackageReference Include="Xabe.FFmpeg" Version="6.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Model\" />
+  </ItemGroup>
+
 </Project>
