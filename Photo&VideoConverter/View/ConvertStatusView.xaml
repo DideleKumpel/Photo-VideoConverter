@@ -37,7 +37,7 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="File name" Binding="{Binding FileName}" Width="20*"/>
                     <DataGridTextColumn Header="File Type" Binding="{Binding FileType}" Width="10*"/>
-                    <DataGridTextColumn Header="File path" Binding="{Binding FilePath}" Width="60*"/>
+                    <DataGridTextColumn Header="File path" Binding="{Binding }" Width="60*"/>
                 </DataGrid.Columns>
             </DataGrid>
         </StackPanel>
@@ -52,9 +52,10 @@
                 CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
                 AutoGenerateColumns="False">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="File name" Binding="{Binding FileName}" Width="20*"/>
-                    <DataGridTextColumn Header="File Type" Binding="{Binding FileType}" Width="20*"/>
-                    <DataGridTextColumn Header="File path" Binding="{Binding FilePath}" Width="60*"/>
+                    <DataGridTextColumn Header="File name" Binding="{Binding FileName}" Width="15*"/>
+                    <DataGridTextColumn Header="File Type" Binding="{Binding FileType}" Width="10*"/>
+                    <DataGridTextColumn Header="File path" Binding="{Binding FilePath}" Width="35*"/>
+                    <DataGridTextColumn Header="Error message" Binding="{Binding FilePath}" Width="30*"/>
                 </DataGrid.Columns>
             </DataGrid>
         </StackPanel>

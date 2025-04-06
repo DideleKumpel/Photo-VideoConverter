@@ -97,6 +97,7 @@ namespace Photo_VideoConverter.ViewModel
 
             ConvertStatusViewModel ViewModel = new ConvertStatusViewModel(setting);
             Application.Current.MainWindow.DataContext = ViewModel;
+            ViewModel.ConversationSetup();
         }
 
         private bool CanStartConvertion()
