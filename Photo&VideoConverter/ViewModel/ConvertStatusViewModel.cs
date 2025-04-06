@@ -6,25 +6,39 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Photo_VideoConverter.Model;
 
 namespace Photo_VideoConverter.ViewModel
 {
-    internal class ConvertStatusViewModel
+    internal class ConvertStatusViewModel : ObservableObject
     {
         private ConverterSettingsModel _settings;
+        private string InputFolderName;
         public double ProgressIndycator { get; set; }
         ObservableCollection<FileDisplayModel> SuccesConversionFileList { get; set; }
         ObservableCollection<FileDisplayModel> FailedConversionFileList { get; set; }
+
+        //tokens to cancel or abort conversion
+        private CancellationTokenSource _cancellationTokenSource;
+        private CancellationTokenSource _abortImportToken;
 
         private int NumberOfFilesToCnvert { get; set; }
         // Variables to truck work of CountAllFilesRecursively method
         private static bool _promptShown = false;
         private static bool _userWantsToContinue = false;
 
+        //COMMANDS
+        public RelayCommand CancelConversionCommand { get; }
+        public RelayCommand AbortConversionCommand { get; }
+
         public ConvertStatusViewModel(ConverterSettingsModel settings) {
             this._settings = settings;
             NumberOfFilesToCnvert = 0;
+
+            CancelConversionCommand = new RelayCommand(CancelConversion);
+            AbortConversionCommand = new RelayCommand(AbortConversion);
         }
 
         public void ConversationSetup()
@@ -61,9 +75,19 @@ namespace Photo_VideoConverter.ViewModel
                 return;
             }
 
+            //Creating a new folder "Input foldername + Coverted" in the output folder to dump all the converted files
+            _settings.OutputPath = Path.Combine(_settings.OutputPath, Path.GetFileName(_settings.InputPath) + "Converted");
+            if (!Directory.Exists(_settings.OutputPath))
+            {
+                Directory.CreateDirectory(_settings.OutputPath);
+            }
+
+            _cancellationTokenSource = new CancellationTokenSource();  // initialize the cancellation token
+            _abortImportToken = new CancellationTokenSource();
+
             // Start the conversion process
         }
-        public int CountAllFilesRecursively(string FolderPath, int Depth = 0)
+        private int CountAllFilesRecursively(string FolderPath, int Depth = 0)
         {
             int fileCount = 0;
 
@@ -113,6 +137,43 @@ namespace Photo_VideoConverter.ViewModel
             }
 
             return fileCount;
+        }
+
+        private void StartConversion(CancellationToken cancellationToken, CancellationToken abortImportToken)
+        {
+            // Logic to start the conversion process
+            // Use _cancellationTokenSource and _abortImportToken for cancellation and aborting
+        }
+
+        private void CancelConversion()
+        {
+            // Logic to cancel the conversion process
+            var CovertsionComformation = MessageBox.Show(
+                        "Are you sure you want to cancel the conversion?",
+                        "",
+                         MessageBoxButton.YesNo,
+                        MessageBoxImage.Information);
+            if (CovertsionComformation == MessageBoxResult.No)
+            {
+                return;
+            }
+            _cancellationTokenSource?.Cancel();
+            // To do Delete progress files
+            Application.Current.MainWindow.DataContext = new ConvertSettingsViewModel();
+        }
+        private void AbortConversion()
+        {
+            // Logic to abort the conversion process
+            var CovertsionComformation = MessageBox.Show(
+                        "Are you sure you want to abort the conversion?",
+                        "",
+                         MessageBoxButton.YesNo,
+                        MessageBoxImage.Information);
+            if (CovertsionComformation == MessageBoxResult.No)
+            {
+                return;
+            }
+            _abortImportToken?.Cancel();
         }
     }
 }
