@@ -5,8 +5,18 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Photo_VideoConverter.View"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
+             d:DesignHeight="600" d:DesignWidth="1200">
+    <Grid Background="White">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Label FontSize="48" Margin="15" > MAIN MENU</Label>
+            <StackPanel Orientation="Horizontal">
+                <Button Width="159" Height="75" Margin="15" Command="{Binding SwitchToConvertSettingCommand}">
+                    <TextBlock Margin="5" TextWrapping="Wrap" HorizontalAlignment="Center" TextAlignment="Center" FontSize="16">Convert contets of whole folder</TextBlock>
+                </Button>
+                <Button Width="150" Height="75" Margin="15" Command="{Binding SwitchToConvertSignleFileCommand}">
+                    <TextBlock Margin="5" TextWrapping="Wrap" HorizontalAlignment="Center" TextAlignment="Center" FontSize="16" >Convert single file</TextBlock>
+                </Button>
+            </StackPanel>
+        </StackPanel>    
     </Grid>
 </UserControl>

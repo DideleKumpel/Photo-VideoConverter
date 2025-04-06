@@ -6,13 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using Photo_VideoConverter.ViewModel;
 
 namespace Photo_VideoConverter.ViewModel
 {
     internal class MainMenuViewModel : ObservableObject
     {
-        RelayCommand SwitchToConvertSettingCommand { get;  }
-        RelayCommand SwitchToConvertSignleFileCommand { get; }
+        public RelayCommand SwitchToConvertSettingCommand { get;  }
+        public RelayCommand SwitchToConvertSignleFileCommand { get; }
 
         public MainMenuViewModel()
         {
@@ -22,8 +23,7 @@ namespace Photo_VideoConverter.ViewModel
 
         private void SwitchToConvertSetting()
         {
-            // Logic to switch to ConvertSettingViewModel
-            //to do when start working on the ConvertSettingViewModel
+            Application.Current.MainWindow.DataContext = new ConvertSettingsViewModel();
         }
         private void SwitchToConvertSingleFile()
         {

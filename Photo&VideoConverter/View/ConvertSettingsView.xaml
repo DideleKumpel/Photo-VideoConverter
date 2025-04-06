@@ -22,9 +22,9 @@
         <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1">
             <StackPanel Margin="10">
                 <Label FontSize="16">Input settings:</Label>
-                <Button Width="150" Height="40" HorizontalAlignment="Left">Chosse input folder</Button>
+                <Button Width="150" Height="40" HorizontalAlignment="Left" Command="{Binding ChoseInputFolderCommand}">Chosse input folder</Button>
                 <TextBlock FontSize="13" Margin="0,5,0,5">Input folder path:</TextBlock>
-                <TextBlock FontSize="13" Text="*Path here*" />
+                <TextBlock FontSize="13" Text="{Binding InputPath}" />
             </StackPanel>
         </Border>
         <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1">
@@ -39,18 +39,23 @@
                 </Grid.ColumnDefinitions>
                 <Label FontSize="16">Output settings:</Label>
                 <StackPanel Grid.Row="1" Margin="5">
-                    <Button Width="150" Height="40" HorizontalAlignment="Left">Chosse output folder</Button>
+                    <Button Width="150" Height="40" HorizontalAlignment="Left" Command="{Binding ChoseInputFolderCommand}">Chosse output folder</Button>
                     <TextBlock FontSize="13" Margin="0,5,0,5">Output folder path:</TextBlock>
-                    <TextBlock FontSize="12" Text="*Path here*" TextWrapping="Wrap"/>
+                    <TextBlock FontSize="12" Text="{Binding OutputPath}" TextWrapping="Wrap"/>
                 </StackPanel>
                 <StackPanel Grid.Row="1" Grid.Column="1" Margin="5">
                     <Label FontSize="12">Output video format:</Label>
-                    <ComboBox></ComboBox>
+                    <ComboBox SelectedItem="{Binding SelectedVideoFormat}" ItemsSource="{Binding VideoFormats}" ></ComboBox>
                     <Label FontSize="12">Output photo format:</Label>
-                    <ComboBox></ComboBox>
+                    <ComboBox SelectedItem="{Binding SelectedImageFormat}" ItemsSource="{Binding ImageFormats}" ></ComboBox>
                 </StackPanel>
             </Grid>
         </Border>
-        <Button Grid.Row="3" Width="150" Height="40" HorizontalAlignment="Center" Margin="10,0,0,0">Start converting</Button>
+        <StackPanel Grid.Row="3" Orientation="Horizontal">
+            <Button  Width="150" Height="40" Margin="10,0,10,0">Start converting</Button>
+            <Border Width="300" Margin="15" BorderThickness="1" BorderBrush="Red" Visibility="{Binding ErrorMessageVisibility}">
+                <TextBlock Foreground="Red" Margin="5" Text="{Binding ErrorMessage}"/>
+            </Border>
+        </StackPanel>
     </Grid>
 </UserControl>
