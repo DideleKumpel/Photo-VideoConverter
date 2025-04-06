@@ -1,0 +1,61 @@
+﻿<UserControl x:Class="Photo_VideoConverter.View.ConvertSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Photo_VideoConverter.View"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="30*"/>
+            <RowDefinition Height="40*"/>
+            <RowDefinition Height="20*"/>
+        </Grid.RowDefinitions>
+        <Border BorderBrush="Black" BorderThickness="1">
+            <Grid>
+            <Button Width="100" Height="35" HorizontalAlignment="Left" Margin="10,0,0,0"> Back to menu</Button>
+            <Label FontSize="28" HorizontalAlignment="Center">CONVERT SETTINGS</Label>
+            </Grid>
+        </Border>
+        <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1">
+            <StackPanel Margin="10">
+                <Label FontSize="16">Input settings:</Label>
+                <Button Width="150" Height="40" HorizontalAlignment="Left" Command="{Binding ChoseInputFolderCommand}">Chosse input folder</Button>
+                <TextBlock FontSize="13" Margin="0,5,0,5">Input folder path:</TextBlock>
+                <TextBlock FontSize="13" Text="{Binding InputPath}" />
+            </StackPanel>
+        </Border>
+        <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1">
+            <Grid Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20*"/>
+                    <RowDefinition Height="80*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50*"/>
+                    <ColumnDefinition Width="50*"/>
+                </Grid.ColumnDefinitions>
+                <Label FontSize="16">Output settings:</Label>
+                <StackPanel Grid.Row="1" Margin="5">
+                    <Button Width="150" Height="40" HorizontalAlignment="Left" Command="{Binding ChoseOutputFolderCommand}">Chosse output folder</Button>
+                    <TextBlock FontSize="13" Margin="0,5,0,5">Output folder path:</TextBlock>
+                    <TextBlock FontSize="12" Text="{Binding OutputPath}" TextWrapping="Wrap"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="1" Margin="5">
+                    <Label FontSize="12">Output video format:</Label>
+                    <ComboBox SelectedItem="{Binding SelectedVideoFormat}" ItemsSource="{Binding VideoFormats}" ></ComboBox>
+                    <Label FontSize="12">Output photo format:</Label>
+                    <ComboBox SelectedItem="{Binding SelectedImageFormat}" ItemsSource="{Binding ImageFormats}" ></ComboBox>
+                </StackPanel>
+            </Grid>
+        </Border>
+        <StackPanel Grid.Row="3" Orientation="Horizontal">
+            <Button  Width="150" Height="40" Margin="10,0,10,0" Command="{Binding ConvertCommand}">Start converting</Button>
+            <Border Width="300" Margin="15" BorderThickness="1" BorderBrush="Red" Visibility="{Binding ErrorMessageVisibility}">
+                <TextBlock Foreground="Red" Margin="5" Text="{Binding ErrorMessage}"/>
+            </Border>
+        </StackPanel>
+    </Grid>
+</UserControl>
