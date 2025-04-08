@@ -19,11 +19,11 @@ namespace Photo_VideoConverter.ViewModel
         public string OutputPath { get; set; }
         public ObservableCollection<string> VideoFormats { get; set; }
         public ObservableCollection<string> ImageFormats { get; set; }
-        private string _selcetedVideFormat;
+        private string _selcetedVideoFormat;
         public string SelectedVideoFormat { 
-            get {  return _selcetedVideFormat; }
+            get {  return _selcetedVideoFormat; }
             set {
-                _selcetedVideFormat = value;
+                _selcetedVideoFormat = value;
                 OnPropertyChanged(nameof(SelectedVideoFormat));
                 ConvertCommand.NotifyCanExecuteChanged();
             }
@@ -44,7 +44,7 @@ namespace Photo_VideoConverter.ViewModel
 
         public RelayCommand ChoseInputFolderCommand { get; }
         public RelayCommand ChoseOutputFolderCommand { get; }
-        public RelayCommand ConvertCommand { get;}
+        public AsyncRelayCommand ConvertCommand { get;}
         public RelayCommand SwitchToMenuCommand { get;}
 
         public ConvertSettingsViewModel()
@@ -52,15 +52,15 @@ namespace Photo_VideoConverter.ViewModel
             InputPath = "none";
             OutputPath = "none";
 
-            VideoFormats = new ObservableCollection<string> { "mp4", "avi", "mov", "mkv", "flv" };
-            ImageFormats = new ObservableCollection<string> { "png", "jpg", "webp", "bmp", "gif" };
+            VideoFormats = new ObservableCollection<string> { "mp4", "avi", "mov", "flv" };
+            ImageFormats = new ObservableCollection<string> { "png", "jpg", "webp", "bmp" };
 
             ErrorMessageVisibility = "Collapsed";
             ErrorMessage = "";
 
             ChoseInputFolderCommand = new RelayCommand(ChoseInputFolder);
             ChoseOutputFolderCommand = new RelayCommand(ChoseOutputFolder);
-            ConvertCommand = new RelayCommand(StartConvertion, CanStartConvertion);
+            ConvertCommand = new AsyncRelayCommand(StartConvertion, CanStartConvertion);
             SwitchToMenuCommand = new RelayCommand(SwitchToMenu);
         }
 
@@ -86,18 +86,46 @@ namespace Photo_VideoConverter.ViewModel
             }
         }
 
-        private void StartConvertion()
+        private async Task StartConvertion()
         {
+            string VideoCodec;
+            string AudioCodec; 
+            switch (_selcetedVideoFormat)  //setting up codecs for viedo format
+            {
+                case "mp4":
+                    VideoCodec = "h264";
+                    AudioCodec = "ac3";
+                    break;
+                case "avi":
+                    VideoCodec = "mjpeg";
+                    AudioCodec = "mp3";
+                    break;
+                case "mov":
+                    VideoCodec = "h264";
+                    AudioCodec = "mp3";
+                    break;
+                case "flv":
+                    VideoCodec = "h264";
+                    AudioCodec = "mp3";
+                    break;
+                default:
+                    MessageBox.Show("Error occured while setting codecs try \nagain or select different video input format.");
+                    return;
+            }
+
+
             ConverterSettingsModel setting = new ConverterSettingsModel {
                 InputPath = this.InputPath,
                 OutputPath = this.OutputPath,
                 OutputImageFormat = _selcetedImagineFormat,
-                OutputVideoFormat = _selcetedVideFormat
+                OutputVideoFormat = _selcetedVideoFormat,
+                OutputVideoCodec = VideoCodec,
+                OutputAudioCodec = AudioCodec
             };
 
             ConvertStatusViewModel ViewModel = new ConvertStatusViewModel(setting);
             Application.Current.MainWindow.DataContext = ViewModel;
-            ViewModel.ConversationSetup();
+            await ViewModel.ConversationSetup();
         }
 
         private bool CanStartConvertion()
