@@ -12,6 +12,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using NReco.VideoConverter;
 using Photo_VideoConverter.Model;
+using SixLabors.ImageSharp;
 
 namespace Photo_VideoConverter.ViewModel
 {
@@ -221,9 +222,9 @@ namespace Photo_VideoConverter.ViewModel
                     {
                         await ConvertVideoAsync(File, OutputFolder);
                     }
-                    else if (Extencsion == ".png" || Extencsion == ".jpg" || Extencsion == ".webp" || Extencsion == ".bmp")
+                    else if (Extencsion == ".png" || Extencsion == ".jpeg" || Extencsion == ".jpg" || Extencsion == ".webp" || Extencsion == ".bmp" || Extencsion == ".gif")
                     {
-                        ConvertImage(File, OutputFolder);
+                        await ConvertImageAsync(File, OutputFolder);
                     }
                     else
                     {
@@ -365,10 +366,14 @@ namespace Photo_VideoConverter.ViewModel
                 throw Error;
             }
         }
-        private void ConvertImage(string inputFilePath, string outputFilePath)
+        private async Task ConvertImageAsync(string inputFilePath, string outputDirectory)
         {
-            // Logic to convert video files
-            // Use cancellationToken to check for cancellation
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(inputFilePath);
+            string outputFilePath = Path.Combine(outputDirectory, (fileNameWithoutExtension + "." + _settings.OutputImageFormat));
+
+            var image = await Image.LoadAsync(inputFilePath);
+            await image.SaveAsync(outputFilePath);
+            image.Dispose(); // Dispose of the image to free up resources
         }
 
         private void LogError(string LogFileDictionary, string ErrorMessage)
