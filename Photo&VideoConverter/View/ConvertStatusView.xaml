@@ -19,7 +19,7 @@
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Margin="10">
             <Label HorizontalAlignment="Center"> Conversion progress:</Label>
-            <ProgressBar Height="15" Margin="15,0"></ProgressBar>
+            <ProgressBar Height="15" Margin="15,0" Value="{Binding ProgressIndycator}"></ProgressBar>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
                 <Button Width="60" Height="20" Command="{Binding AbortConversionCommand}"> Abort</Button>
                 <Button Width="60" Height="20" Margin="10,0,0,0" Command="{Binding CancelConversionCommand}">Cancel</Button>
@@ -34,35 +34,37 @@
         <StackPanel Grid.Row="2" Margin="10">
             <StackPanel Orientation="Horizontal">
                 <TextBlock>Number of convertet files-</TextBlock>
-                <TextBlock Text="*NUMBER*" />
+                <TextBlock Text="{Binding NumOfSucceses}" />
             </StackPanel>
             <Label>Succes list</Label>
             <DataGrid
-               Height="350"
+               Height="250"
+                ItemsSource="{Binding SuccesConversionFileList}"
                 CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
                 AutoGenerateColumns="False">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="File name" Binding="{Binding FileName}" Width="20*"/>
-                    <DataGridTextColumn Header="File Type" Binding="{Binding FileType}" Width="10*"/>
-                    <DataGridTextColumn Header="File path" Binding="{Binding }" Width="60*"/>
+                    <DataGridTextColumn Header="File name" Binding="{Binding Name}" Width="20*"/>
+                    <DataGridTextColumn Header="File Type" Binding="{Binding Type}" Width="10*"/>
+                    <DataGridTextColumn Header="File path" Binding="{Binding Path}" Width="60*"/>
                 </DataGrid.Columns>
             </DataGrid>
         </StackPanel>
         <StackPanel Grid.Row="2" Grid.Column="1" Margin="10">
             <StackPanel Orientation="Horizontal">
                 <TextBlock>Number failed conversions-</TextBlock>
-                <TextBlock Text="*NUMBER*" />
+                <TextBlock Text="{Binding NumOfFailures}" />
             </StackPanel>
             <Label>Error list</Label>
             <DataGrid
-                Height="350"
+                Height="250"
+                ItemsSource="{Binding FailedConversionFileList}"
                 CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
                 AutoGenerateColumns="False">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="File name" Binding="{Binding FileName}" Width="15*"/>
-                    <DataGridTextColumn Header="File Type" Binding="{Binding FileType}" Width="10*"/>
-                    <DataGridTextColumn Header="File path" Binding="{Binding FilePath}" Width="35*"/>
-                    <DataGridTextColumn Header="Error message" Binding="{Binding FilePath}" Width="30*"/>
+                    <DataGridTextColumn Header="File name" Binding="{Binding Name}" Width="15*"/>
+                    <DataGridTextColumn Header="File Type" Binding="{Binding Type}" Width="10*"/>
+                    <DataGridTextColumn Header="File path" Binding="{Binding Path}" Width="35*"/>
+                    <DataGridTextColumn Header="Error message" Binding="{Binding Path}" Width="30*"/>
                 </DataGrid.Columns>
             </DataGrid>
         </StackPanel>

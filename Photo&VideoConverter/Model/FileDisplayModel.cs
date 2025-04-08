@@ -8,9 +8,9 @@ namespace Photo_VideoConverter.Model
 {
     internal class FileDisplayModel
     {
-        string Name;
-        string Type;
-        string Path;
-        string ErrorMessage;
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public string Path { get; set; }
+        public string ErrorMessage { get; set; }
     }
 }
