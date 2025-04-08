@@ -18,7 +18,9 @@ namespace Photo_VideoConverter.ViewModel
     internal class ConvertStatusViewModel : ObservableObject
     {
         private ConverterSettingsModel _settings;
-        public double ProgressIndycator { get; set; }
+        public double ProgressIndycator { get; set; } //progress bar for whole conversion
+        public double FileProgressIndycator { get; set; } // progress bar for single file conversion
+        public string CurrentConvertionFile { get; set; } // name of the file that is currently being converted
         public ObservableCollection<FileDisplayModel> SuccesConversionFileList { get; set; }
         public int NumOfSucceses { get; set; }
         public ObservableCollection<FileDisplayModel> FailedConversionFileList { get; set; }
@@ -172,6 +174,9 @@ namespace Photo_VideoConverter.ViewModel
             {
                 try
                 {
+                    CurrentConvertionFile = File;
+                    OnPropertyChanged(nameof(CurrentConvertionFile)); //update the UI with the current file being converted
+                    //Check file extesnion
                     string Extencsion = Path.GetExtension(File);
                     if (Extencsion == $".{_settings.OutputImageFormat}" || Extencsion == $".{_settings.OutputVideoFormat}") // if file is already in right format we just coppy it
                     {
@@ -269,6 +274,8 @@ namespace Photo_VideoConverter.ViewModel
                     ConverterSetting.VideoCodec = _settings.OutputVideoCodec;
                     ConverterSetting.AudioCodec = _settings.OutputAudioCodec;
 
+                    Converter.ConvertProgress += HandleConversionProgress;      //assing metod to event to track progress of file convertion
+
 
                     Converter.ConvertMedia(inputFilePath, null, outputFilePath, _settings.OutputVideoFormat, ConverterSetting);
                 });
@@ -341,6 +348,11 @@ namespace Photo_VideoConverter.ViewModel
             File.AppendAllText(LogFilePath, ErrorMessage);
         }
 
+        private void HandleConversionProgress(object sender, ConvertProgressEventArgs args)
+        {
+            FileProgressIndycator = (args.Processed.TotalSeconds / args.TotalDuration.TotalSeconds) * 100;
+            OnPropertyChanged(nameof(FileProgressIndycator));
+        }
         private void CancelConversion()
         {
             // Logic to cancel the conversion process
