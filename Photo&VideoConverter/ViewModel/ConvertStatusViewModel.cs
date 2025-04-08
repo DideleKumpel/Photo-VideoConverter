@@ -18,13 +18,16 @@ namespace Photo_VideoConverter.ViewModel
     internal class ConvertStatusViewModel : ObservableObject
     {
         private ConverterSettingsModel _settings;
+        private FFMpegConverter Converter;
+        private ConvertSettings ConverterSetting;
         public double ProgressIndycator { get; set; } //progress bar for whole conversion
         public double FileProgressIndycator { get; set; } // progress bar for single file conversion
         public string CurrentConvertionFile { get; set; } // name of the file that is currently being converted
         public ObservableCollection<FileDisplayModel> SuccesConversionFileList { get; set; }
         public int NumOfSucceses { get; set; }
         public ObservableCollection<FileDisplayModel> FailedConversionFileList { get; set; }
-        public int NumOfFailures {  get; set; }
+        public int NumOfFailures { get; set; }
+        public string FinishConversionBtnVisibility { get; set; }
 
         //tokens to cancel or abort conversion
         private CancellationTokenSource _cancellationTokenSource;
@@ -37,23 +40,38 @@ namespace Photo_VideoConverter.ViewModel
         private static bool _promptShown = false;
         private static bool _userWantsToContinue = false;
 
+        //FLAGS
+        private bool ConvertionInProgress;
+
         //COMMANDS
         public RelayCommand CancelConversionCommand { get; }
         public RelayCommand AbortConversionCommand { get; }
+        public RelayCommand FinishConversionCommand { get; }
 
         public ConvertStatusViewModel(ConverterSettingsModel settings) {
             this._settings = settings;
             NumberOfFilesToCnvert = 0;
 
             ProgressIndycator = 0;
+            ConvertionInProgress = true;
+
+            FinishConversionBtnVisibility = "Collapsed";
 
             SuccesConversionFileList = new ObservableCollection<FileDisplayModel>();
             NumOfSucceses = 0;
             FailedConversionFileList = new ObservableCollection<FileDisplayModel>();
             NumOfFailures = 0;
 
+            Converter = new FFMpegConverter();
+            //set up converter settings
+            ConverterSetting = new ConvertSettings();
+            //setting up out put viedo and audio codec
+            ConverterSetting.VideoCodec = _settings.OutputVideoCodec;
+            ConverterSetting.AudioCodec = _settings.OutputAudioCodec;
+
             CancelConversionCommand = new RelayCommand(CancelConversion);
             AbortConversionCommand = new RelayCommand(AbortConversion);
+            FinishConversionCommand = new RelayCommand(FinishConversion, CanFinishConversion);
         }
 
         public async Task ConversationSetupAsync()
@@ -112,6 +130,11 @@ namespace Photo_VideoConverter.ViewModel
             {
                 Console.WriteLine(ex.ToString());
             }
+            ConvertionInProgress = false;
+            FinishConversionBtnVisibility = "visible";
+            OnPropertyChanged(nameof(FinishConversionBtnVisibility));
+            FinishConversionCommand.NotifyCanExecuteChanged();
+            MessageBox.Show("Conversion completed. \n Click \"finish\" to go back to main menu", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         private int CountAllFilesRecursively(string FolderPath, int Depth = 0)
         {
@@ -174,6 +197,18 @@ namespace Photo_VideoConverter.ViewModel
             {
                 try
                 {
+                    if (cancellationToken.Token.IsCancellationRequested)
+                    {
+                        // Handle cancellation 
+                        System.IO.Directory.Delete(_settings.OutputPath, recursive: true);  //delete the output folder
+                        Application.Current.MainWindow.DataContext = new ConvertSettingsViewModel();
+                        return; // Exit the loop if cancellation is requested
+                    }
+                    if (abortImportToken.Token.IsCancellationRequested)
+                    {
+                        ConvertionInProgress = false;
+                        return;
+                    }
                     CurrentConvertionFile = File;
                     OnPropertyChanged(nameof(CurrentConvertionFile)); //update the UI with the current file being converted
                     //Check file extesnion
@@ -182,7 +217,7 @@ namespace Photo_VideoConverter.ViewModel
                     {
                         string CopyFile = Path.Combine(OutputFolder, Path.GetFileName(File));
                         System.IO.File.Copy(File, CopyFile, true);
-                    }else if (Extencsion == ".mp4" || Extencsion == ".avi" || Extencsion == ".mov" || Extencsion == ".mkv" || Extencsion == ".flv" || Extencsion == ".webm")
+                    } else if (Extencsion == ".mp4" || Extencsion == ".avi" || Extencsion == ".mov" || Extencsion == ".mkv" || Extencsion == ".flv" || Extencsion == ".webm")
                     {
                         await ConvertVideoAsync(File, OutputFolder);
                     }
@@ -268,11 +303,6 @@ namespace Photo_VideoConverter.ViewModel
                 string outputFilePath = Path.Combine(outputDirectory, (fileNameWithoutExtension + "." + _settings.OutputVideoFormat));
                 await Task.Run(() =>
                 {
-                    var Converter = new FFMpegConverter();
-                    var ConverterSetting = new ConvertSettings();
-                    //setting up out put viedo and audio codec
-                    ConverterSetting.VideoCodec = _settings.OutputVideoCodec;
-                    ConverterSetting.AudioCodec = _settings.OutputAudioCodec;
 
                     Converter.ConvertProgress += HandleConversionProgress;      //assing metod to event to track progress of file convertion
 
@@ -365,9 +395,8 @@ namespace Photo_VideoConverter.ViewModel
             {
                 return;
             }
+            Converter.Stop();
             _cancellationTokenSource?.Cancel();
-            // To do Delete progress files
-            Application.Current.MainWindow.DataContext = new ConvertSettingsViewModel();
         }
         private void AbortConversion()
         {
@@ -381,7 +410,16 @@ namespace Photo_VideoConverter.ViewModel
             {
                 return;
             }
+            Converter.Stop();
             _abortImportToken?.Cancel();
+        }
+        private void FinishConversion()
+        {
+            Application.Current.MainWindow.DataContext = new MainMenuViewModel();
+        }
+        private bool CanFinishConversion()
+        {
+            return !ConvertionInProgress;
         }
     }
 }
