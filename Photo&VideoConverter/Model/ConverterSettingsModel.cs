@@ -12,6 +12,8 @@ namespace Photo_VideoConverter.Model
         public string InputPath;
         public string OutputPath;
         public string OutputVideoFormat;
+        public string OutputVideoCodec;
+        public string OutputAudioCodec;
         public string OutputImageFormat;
     }
 }
