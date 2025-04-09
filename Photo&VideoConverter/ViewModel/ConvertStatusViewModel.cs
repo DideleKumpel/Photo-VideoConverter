@@ -218,7 +218,7 @@ namespace Photo_VideoConverter.ViewModel
                     {
                         string CopyFile = Path.Combine(OutputFolder, Path.GetFileName(File));
                         System.IO.File.Copy(File, CopyFile, true);
-                    } else if (Extencsion == ".mp4" || Extencsion == ".avi" || Extencsion == ".mov" || Extencsion == ".mkv" || Extencsion == ".flv" || Extencsion == ".webm")
+                    } else if (Extencsion == ".mp4" || Extencsion == ".avi" || Extencsion == ".mov" || Extencsion == ".mkv" || Extencsion == ".flv" || Extencsion == ".webm" || Extencsion == "mpeg")
                     {
                         await ConvertVideoAsync(File, OutputFolder);
                     }

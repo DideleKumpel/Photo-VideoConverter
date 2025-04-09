@@ -52,7 +52,7 @@ namespace Photo_VideoConverter.ViewModel
             InputPath = "none";
             OutputPath = "none";
 
-            VideoFormats = new ObservableCollection<string> { "mp4", "avi", "mov", "flv" };
+            VideoFormats = new ObservableCollection<string> { "mp4", "avi", "mov", "flv", "mpeg" };
             ImageFormats = new ObservableCollection<string> { "png", "jpg", "webp", "bmp" };
 
             ErrorMessageVisibility = "Collapsed";
@@ -97,8 +97,8 @@ namespace Photo_VideoConverter.ViewModel
                     AudioCodec = "ac3";
                     break;
                 case "avi":
-                    VideoCodec = "mjpeg";
-                    AudioCodec = "mp3";
+                    VideoCodec = "h264";
+                    AudioCodec = "ac3";
                     break;
                 case "mov":
                     VideoCodec = "h264";
@@ -107,6 +107,10 @@ namespace Photo_VideoConverter.ViewModel
                 case "flv":
                     VideoCodec = "h264";
                     AudioCodec = "mp3";
+                    break;
+                case "mpeg":
+                    VideoCodec = "mpeg2video";
+                    AudioCodec = "mp2";
                     break;
                 default:
                     MessageBox.Show("Error occured while setting codecs try \nagain or select different video input format.");
