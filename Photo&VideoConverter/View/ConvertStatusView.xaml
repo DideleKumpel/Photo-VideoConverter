@@ -64,7 +64,7 @@
                     <DataGridTextColumn Header="File name" Binding="{Binding Name}" Width="15*"/>
                     <DataGridTextColumn Header="File Type" Binding="{Binding Type}" Width="10*"/>
                     <DataGridTextColumn Header="File path" Binding="{Binding Path}" Width="35*"/>
-                    <DataGridTextColumn Header="Error message" Binding="{Binding Path}" Width="30*"/>
+                    <DataGridTextColumn Header="Error message" Binding="{Binding ErrorMessage}" Width="30*"/>
                 </DataGrid.Columns>
             </DataGrid>
         </StackPanel>
