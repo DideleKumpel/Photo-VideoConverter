@@ -42,6 +42,21 @@ namespace Photo_VideoConverter.ViewModel
         public string ErrorMessageVisibility { get; set; }
         public string ErrorMessage { get; set; }
 
+        private bool _skipRadioBtn;
+        public bool SkipRadioBtn
+        {
+            get
+            {
+                return _skipRadioBtn;
+            }
+            set
+            {
+                _skipRadioBtn = value;
+                OnPropertyChanged(nameof(SelectedVideoFormat));
+                ConvertCommand?.NotifyCanExecuteChanged();
+            }
+        }
+
         public RelayCommand ChoseInputFolderCommand { get; }
         public RelayCommand ChoseOutputFolderCommand { get; }
         public AsyncRelayCommand ConvertCommand { get;}
@@ -51,6 +66,7 @@ namespace Photo_VideoConverter.ViewModel
         {
             InputPath = "none";
             OutputPath = "none";
+            SkipRadioBtn = true;
 
             VideoFormats = new ObservableCollection<string> { "mp4", "avi", "mov", "flv", "mpeg" };
             ImageFormats = new ObservableCollection<string> { "png", "jpg", "webp", "bmp" };
@@ -124,7 +140,8 @@ namespace Photo_VideoConverter.ViewModel
                 OutputImageFormat = _selcetedImagineFormat,
                 OutputVideoFormat = _selcetedVideoFormat,
                 OutputVideoCodec = VideoCodec,
-                OutputAudioCodec = AudioCodec
+                OutputAudioCodec = AudioCodec,
+                SkipUnknowExtension = SkipRadioBtn
             };
 
             ConvertStatusViewModel ViewModel = new ConvertStatusViewModel(setting);

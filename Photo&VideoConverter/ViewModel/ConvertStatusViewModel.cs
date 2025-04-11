@@ -230,6 +230,11 @@ namespace Photo_VideoConverter.ViewModel
                     {
                         string ErrorMessage = $"\n CONVERT ERROR \nFile: {File} \n -E- Unknow file format";
                         Exception Error = new Exception(ErrorMessage);
+                        if(!_settings.SkipUnknowExtension)  //user choose to copy unknow extesions to outputfolder
+                        {
+                            string CopyFile = Path.Combine(OutputFolder, Path.GetFileName(File));
+                            System.IO.File.Copy(File, CopyFile, true);
+                        }
                         throw Error;
                     }
                     //On succesed conversation
