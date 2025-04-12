@@ -22,8 +22,8 @@
         <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1">
             <StackPanel Margin="10">
                 <Label FontSize="16">Input settings:</Label>
-                <Button Width="150" Height="40" HorizontalAlignment="Left" Command="{Binding ChoseInputFolderCommand}">Chosse input folder</Button>
-                <TextBlock FontSize="13" Margin="0,5,0,5">Input folder path:</TextBlock>
+                <Button Width="150" Height="40" HorizontalAlignment="Left" Command="{Binding SelectInputFileCommand}">Chosse input file</Button>
+                <TextBlock FontSize="13" Margin="0,5,0,5">Input file path:</TextBlock>
                 <TextBlock FontSize="13" Text="{Binding InputPath}" />
             </StackPanel>
         </Border>

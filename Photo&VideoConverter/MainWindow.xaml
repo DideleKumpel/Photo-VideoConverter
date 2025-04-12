@@ -18,6 +18,9 @@
         <DataTemplate x:Name="ConverterStatusTemplate" DataType="{x:Type viewmodels:ConvertStatusViewModel}">
             <views:ConvertStatusView DataContext="{Binding}"/>
         </DataTemplate>
+        <DataTemplate x:Name="ConverterSingleFileTemplate" DataType="{x:Type viewmodels:ConvertSingleFileViewModel}">
+            <views:ConvertSingleFileView DataContext="{Binding}"/>
+        </DataTemplate>
     </Window.Resources>
     <Grid>
         <ContentControl Content="{Binding}"/>

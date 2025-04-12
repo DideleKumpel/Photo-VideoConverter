@@ -24,19 +24,6 @@ namespace Photo_VideoConverter
             InitializeComponent();
 
             DataContext = new MainMenuViewModel();
-
-            //ConverterSettingsModel model = new ConverterSettingsModel()
-            //{
-            //    InputPath = "\"C:\\Users\\CEM\\Desktop\\cyk\\received_3698267010412707.mp4\"",
-            //    OutputPath = "\"C:\\Users\\CEM\\Desktop\\pyk\"",
-            //    OutputVideoFormat = "mkv",
-            //    OutputAudioCodec = "ACC",
-            //    OutputVideoCodec = "H.265"
-
-            //};
-            //ConvertStatusViewModel ViewModel = new ConvertStatusViewModel(model);
-            //DataContext = ViewModel;
-            //ViewModel.ConversationSetup();
         }
     }
 }
