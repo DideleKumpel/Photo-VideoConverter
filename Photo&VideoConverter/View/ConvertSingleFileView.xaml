@@ -9,8 +9,8 @@
     <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="15*"/>
-            <RowDefinition Height="30*"/>
-            <RowDefinition Height="40*"/>
+            <RowDefinition Height="25*"/>
+            <RowDefinition Height="45*"/>
             <RowDefinition Height="15*"/>
         </Grid.RowDefinitions>
         <Border BorderBrush="Black" BorderThickness="1">
@@ -41,20 +41,22 @@
                 <StackPanel Grid.Row="1" >
                     <Label>Select how converted files should be saved:</Label>
                     <StackPanel Orientation="Horizontal">
-                        <RadioButton IsChecked="{Binding SkipRadioBtn}">Overwrite</RadioButton>
+                        <RadioButton IsChecked="{Binding OverwriteSettings}">Overwrite</RadioButton>
                         <RadioButton Margin="15,0,0,0">Make copy</RadioButton>
                     </StackPanel>
-                    <CheckBox Margin="0,5" IsChecked="{Binding DoNotOverWrite}">Save copy in different place</CheckBox>
-                    <StackPanel Visibility="{Binding OverWrtieSettingsVisibility}">
-                        <Button Width="150" Height="40" HorizontalAlignment="Left" Command="{Binding ChoseOutputFolderCommand}">Chosse output folder</Button>
-                        <TextBlock FontSize="13" Margin="0,5,0,5">Output folder path:</TextBlock>
-                        <TextBlock FontSize="12" Text="{Binding OutputPath}" TextWrapping="Wrap"/>
+                    <StackPanel Visibility="{Binding OutputSaveSettingsVisibility}">
+                        <CheckBox Margin="0,5" IsChecked="{Binding SaveCopyInDiffrentLocationSetting}">Save copy in different place</CheckBox>
+                        <StackPanel Visibility="{Binding ChoseOutputFileBtnVisibility}">
+                            <Button Width="150" Height="40" HorizontalAlignment="Left" Command="{Binding ChoseOutputFolderCommand}">Chosse output folder</Button>
+                            <TextBlock FontSize="13" Margin="0,5,0,5">Output folder path:</TextBlock>
+                            <TextBlock FontSize="12" Text="{Binding OutputPath}" TextWrapping="Wrap"/>
+                        </StackPanel>
                     </StackPanel>
 
                 </StackPanel>
                 <StackPanel Grid.Row="1" Grid.Column="1" Margin="5">
                     <Label FontSize="12">Output format:</Label>
-                    <ComboBox SelectedItem="{Binding SelectedVideoFormat}" ItemsSource="{Binding VideoFormats}" ></ComboBox>
+                    <ComboBox SelectedItem="{Binding SelectedFormat}" ItemsSource="{Binding Formats}" ></ComboBox>
                     <StackPanel Grid.Row="3" Orientation="Horizontal" Height="120">
                         <Button  Width="150" Height="40" Margin="10,0,10,0" Command="{Binding ConvertCommand}">Start converting</Button>
                         <Border Width="300" Margin="15" BorderThickness="1" BorderBrush="Red" Visibility="{Binding ErrorMessageVisibility}">

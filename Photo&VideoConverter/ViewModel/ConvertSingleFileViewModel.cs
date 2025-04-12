@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Photo_VideoConverter.ViewModel
 {
@@ -26,6 +27,55 @@ namespace Photo_VideoConverter.ViewModel
             }
         }
 
+        private bool _overwriteSettings;
+        public bool OverwriteSettings
+        {
+            get
+            {
+                return _overwriteSettings;
+            }
+            set
+            {
+                _overwriteSettings = value;
+                OnPropertyChanged(nameof(OverwriteSettings));
+                if (OverwriteSettings)
+                {
+                    OutputSaveSettingsVisibility = Visibility.Collapsed;   //if true show output folder settings
+                }
+                else
+                {
+                    OutputSaveSettingsVisibility = Visibility.Visible;  //hide all outputfolder settings
+                }
+                OnPropertyChanged(nameof(OutputSaveSettingsVisibility));
+            }
+        }
+        public  Visibility OutputSaveSettingsVisibility { get; set; }
+
+        private bool _saveCopyInDiffrentLocationSetting;
+        public bool SaveCopyInDiffrentLocationSetting
+        {
+            get
+            {
+                return _saveCopyInDiffrentLocationSetting;
+            }
+            set
+            {
+                _saveCopyInDiffrentLocationSetting = value;
+                OnPropertyChanged(nameof(SaveCopyInDiffrentLocationSetting));
+                if (SaveCopyInDiffrentLocationSetting)
+                {
+                    ChoseOutputFileBtnVisibility = Visibility.Visible;
+                }
+                else
+                {
+                    ChoseOutputFileBtnVisibility = Visibility.Collapsed;
+                }
+                OnPropertyChanged(nameof(ChoseOutputFileBtnVisibility));
+            }
+        }
+
+        public Visibility ChoseOutputFileBtnVisibility { get; set; }
+
         //COMMANDS
         public RelayCommand SelectInputFileCommand { get; }
         public RelayCommand SelectOutputFolderCommand { get; }
@@ -33,6 +83,9 @@ namespace Photo_VideoConverter.ViewModel
 
         public ConvertSingleFileViewModel()
         {
+            OverwriteSettings = true;
+            SaveCopyInDiffrentLocationSetting = false;
+
             SelectInputFileCommand = new RelayCommand(SelectInputFile);
         }
 
@@ -47,7 +100,31 @@ namespace Photo_VideoConverter.ViewModel
             {
                 InputPath = fileDialog.FileName;
                 OnPropertyChanged(nameof(InputPath));
+                UpdateAvailableOutputFormats();
             }
+        }
+
+        public void UpdateAvailableOutputFormats()
+        {
+            SelectedFormat = null;      //reset selected format
+            Formats = new ObservableCollection<string>();
+            //mach combobox formats to the format of selected file
+            if (InputPath.EndsWith(".mp4") || InputPath.EndsWith(".avi") || InputPath.EndsWith(".mov") || InputPath.EndsWith(".flv") || InputPath.EndsWith(".mpeg"))
+            {
+                Formats.Add("mp4");
+                Formats.Add("avi");
+                Formats.Add("mov");
+                Formats.Add("flv");
+                Formats.Add("mpeg");
+            }
+            else if (InputPath.EndsWith(".png") || InputPath.EndsWith(".jpg") || InputPath.EndsWith(".webp") || InputPath.EndsWith(".bmp"))
+            {
+                Formats.Add("png");
+                Formats.Add("jpg");
+                Formats.Add("webp");
+                Formats.Add("bmp");
+            }
+            OnPropertyChanged(nameof(Formats));
         }
     }
 }
