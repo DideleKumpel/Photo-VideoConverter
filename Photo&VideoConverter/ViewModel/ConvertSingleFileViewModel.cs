@@ -15,6 +15,7 @@ namespace Photo_VideoConverter.ViewModel
     {
         public string InputPath { get; set; }
         public string OutputPath { get; set; }
+
         public ObservableCollection<string> Formats { get; set; }
         private string _selcetedFormat;
         public string SelectedFormat
@@ -24,7 +25,7 @@ namespace Photo_VideoConverter.ViewModel
             {
                 _selcetedFormat = value;
                 OnPropertyChanged(nameof(SelectedFormat));
-                //ConvertCommand.NotifyCanExecuteChanged();
+                ConvertCommand.NotifyCanExecuteChanged();
             }
         }
 
@@ -72,10 +73,13 @@ namespace Photo_VideoConverter.ViewModel
                     ChoseOutputFileBtnVisibility = Visibility.Collapsed;
                 }
                 OnPropertyChanged(nameof(ChoseOutputFileBtnVisibility));
+                ConvertCommand?.NotifyCanExecuteChanged();
             }
         }
-
         public Visibility ChoseOutputFileBtnVisibility { get; set; }
+
+        public string ErrorMessage { get; set; }
+        public Visibility ErrorMessageVisibility { get; set; }
 
         //COMMANDS
         public RelayCommand SelectInputFileCommand { get; }
@@ -89,9 +93,10 @@ namespace Photo_VideoConverter.ViewModel
 
             SelectInputFileCommand = new RelayCommand(SelectInputFile);
             SelectOutputFolderCommand = new RelayCommand(SelectOutputFolder);
+            ConvertCommand = new AsyncRelayCommand(StartConvertion, CanStartConvertion);
         }
 
-        public void SelectInputFile()
+        private void SelectInputFile()
         {
             var fileDialog = new Microsoft.Win32.OpenFileDialog();
             fileDialog.Filter = "Video files (*.mp4, *.avi, *.mov, *.flv, *.mpeg)|*.mp4;*.avi;*.mov;*.flv;*.mpeg|" +
@@ -104,9 +109,10 @@ namespace Photo_VideoConverter.ViewModel
                 OnPropertyChanged(nameof(InputPath));
                 UpdateAvailableOutputFormats();
             }
+            ConvertCommand.NotifyCanExecuteChanged();
         }
 
-        public void UpdateAvailableOutputFormats()
+        private void UpdateAvailableOutputFormats()
         {
             SelectedFormat = null;      //reset selected format
             Formats = new ObservableCollection<string>();
@@ -128,7 +134,7 @@ namespace Photo_VideoConverter.ViewModel
             }
             OnPropertyChanged(nameof(Formats));
         }
-        public void SelectOutputFolder()
+        private void SelectOutputFolder()
         {
             var folderDialog = new OpenFolderDialog();
             if (folderDialog.ShowDialog() == true)
@@ -136,6 +142,71 @@ namespace Photo_VideoConverter.ViewModel
                 OutputPath = folderDialog.FolderName;
                 OnPropertyChanged(nameof(OutputPath));
             }
+            ConvertCommand.NotifyCanExecuteChanged();
         }
+
+        private async Task StartConvertion()
+        {
+
+        }
+
+        private bool CanStartConvertion()
+        {
+            bool CanConvert = true;
+            string Errors = null;
+            if (InputPath == null || InputPath == "none")
+            {
+                CanConvert = false;
+                if (string.IsNullOrEmpty(Errors))
+                {
+                    Errors = "Chose input file.";
+                }
+                else
+                {
+                    Errors += "\n Chose input file.";
+                }
+            }
+            if (SaveCopyInDiffrentLocationSetting)
+            {
+                if(OutputPath == null || OutputPath == "none")
+                {
+                    CanConvert = false;
+                    if (string.IsNullOrEmpty(Errors))
+                    {
+                        Errors = "Chose output folder.";
+                    }
+                    else
+                    {
+                        Errors += "\n Chose output folder.";
+                    }
+                }
+            }
+            if (SelectedFormat == null)
+            {
+                CanConvert = false;
+                if (string.IsNullOrEmpty(Errors))
+                {
+                    Errors = "Chose output format.";
+                }
+                else
+                {
+                    Errors += "\n Chose output format.";
+                }
+            }
+            if (!CanConvert)
+            {
+                ErrorMessage = Errors;
+                ErrorMessageVisibility = Visibility.Visible;
+            }
+            else
+            {
+                ErrorMessage = "";
+                ErrorMessageVisibility = Visibility.Collapsed;
+            }
+            OnPropertyChanged(nameof(ErrorMessage));
+            OnPropertyChanged(nameof(ErrorMessageVisibility));
+            return CanConvert;
+        }
+
     }
 }
