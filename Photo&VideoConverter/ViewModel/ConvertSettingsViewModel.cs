@@ -39,8 +39,30 @@ namespace Photo_VideoConverter.ViewModel
             }
         }
 
-        public string ErrorMessageVisibility { get; set; }
+        public Visibility ErrorMessageVisibility { get; set; }
         public string ErrorMessage { get; set; }
+        private bool _doNotOverWrite;
+        public bool DoNotOverWrite { get
+            {
+                return _doNotOverWrite;
+            }
+            set
+            {
+                _doNotOverWrite = value;
+                OnPropertyChanged(nameof(DoNotOverWrite));
+                if (DoNotOverWrite)
+                {
+                    OverWrtieSettingsVisibility = Visibility.Visible;   //if true show output folder settings
+                }
+                else
+                {
+                    OverWrtieSettingsVisibility = Visibility.Collapsed;  //hide all outputfolder settings
+                }
+                OnPropertyChanged(nameof(OverWrtieSettingsVisibility));
+                ConvertCommand?.NotifyCanExecuteChanged();
+            }
+        }
+        public Visibility OverWrtieSettingsVisibility {  get; set; }
 
         private bool _skipRadioBtn;
         public bool SkipRadioBtn
@@ -67,11 +89,13 @@ namespace Photo_VideoConverter.ViewModel
             InputPath = "none";
             OutputPath = "none";
             SkipRadioBtn = true;
+            DoNotOverWrite = false;
+            OverWrtieSettingsVisibility = Visibility.Collapsed;
 
             VideoFormats = new ObservableCollection<string> { "mp4", "avi", "mov", "flv", "mpeg" };
             ImageFormats = new ObservableCollection<string> { "png", "jpg", "webp", "bmp" };
 
-            ErrorMessageVisibility = "Collapsed";
+            ErrorMessageVisibility = Visibility.Collapsed;
             ErrorMessage = "";
 
             ChoseInputFolderCommand = new RelayCommand(ChoseInputFolder);
@@ -136,13 +160,21 @@ namespace Photo_VideoConverter.ViewModel
 
             ConverterSettingsModel setting = new ConverterSettingsModel {
                 InputPath = this.InputPath,
-                OutputPath = this.OutputPath,
                 OutputImageFormat = _selcetedImagineFormat,
                 OutputVideoFormat = _selcetedVideoFormat,
                 OutputVideoCodec = VideoCodec,
                 OutputAudioCodec = AudioCodec,
-                SkipUnknowExtension = SkipRadioBtn
+                SkipUnknowExtension = SkipRadioBtn,
+                OverWriteExistingFiles = !DoNotOverWrite
             };
+            if (!DoNotOverWrite)  //if user choose to overwrite we set output path to input path
+            {
+                setting.OutputPath = InputPath;
+            }   //if user choose to not overwrite we set output path to output path     
+            else
+            {
+                setting.OutputPath = OutputPath;
+            }
 
             ConvertStatusViewModel ViewModel = new ConvertStatusViewModel(setting);
             
@@ -155,39 +187,43 @@ namespace Photo_VideoConverter.ViewModel
             bool CanConvert = true;
             string Errors = null;
             if (InputPath == null || InputPath == "none")
+                {
+                    CanConvert = false;
+                    if (string.IsNullOrEmpty(Errors))
+                    {
+                        Errors = "Chose input folder.";
+                    }
+                    else
+                    {
+                        Errors += "\n Chose input folder.";
+                    }
+                }
+            if (DoNotOverWrite) //if user choose to overwrite we dont need to check settings resposible for that 
             {
-                CanConvert = false;
-                if (string.IsNullOrEmpty(Errors))
+                
+                if (OutputPath == null || OutputPath == "none")
                 {
-                    Errors = "Chose input folder.";
+                    CanConvert = false;
+                    if (string.IsNullOrEmpty(Errors))
+                    {
+                        Errors = "Chose output folder.";
+                    }
+                    else
+                    {
+                        Errors += "\n Chose output folder.";
+                    }
                 }
-                else
+                if (CanConvert == true && InputPath == OutputPath)
                 {
-                    Errors += "\n Chose input folder.";
-                }
-            }
-            if (OutputPath == null || OutputPath == "none")
-            {
-                CanConvert = false;
-                if (string.IsNullOrEmpty(Errors))
-                {
-                    Errors = "Chose output folder.";
-                }
-                else
-                {
-                    Errors += "\n Chose output folder.";
-                }
-            }
-            if (CanConvert == true && InputPath == OutputPath)
-            {
-                CanConvert = false;
-                if (string.IsNullOrEmpty(Errors))
-                {
-                    Errors = "Input and output folders can't be the same.";
-                }
-                else
-                {
-                    Errors += "\n Input and output folders can't be the same.";
+                    CanConvert = false;
+                    if (string.IsNullOrEmpty(Errors))
+                    {
+                        Errors = "Input and output folders can't be the same.";
+                    }
+                    else
+                    {
+                        Errors += "\n Input and output folders can't be the same.";
+                    }
                 }
             }
             if (SelectedVideoFormat == null)
@@ -216,12 +252,12 @@ namespace Photo_VideoConverter.ViewModel
             if (!CanConvert)
             {
                 ErrorMessage = Errors;
-                ErrorMessageVisibility = "Visible";
+                ErrorMessageVisibility = Visibility.Visible;
             }
             else
             {
                 ErrorMessage = "";
-                ErrorMessageVisibility = "Collapsed";
+                ErrorMessageVisibility = Visibility.Collapsed;
             }
             OnPropertyChanged(nameof(ErrorMessage));
             OnPropertyChanged(nameof(ErrorMessageVisibility));

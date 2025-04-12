@@ -113,12 +113,17 @@ namespace Photo_VideoConverter.ViewModel
 
             SigleFileConvertToProgress = 100.0 / NumberOfFilesToCnvert;
 
-            //Creating a new folder "Input foldername + Coverted" in the output folder to dump all the converted files
-            _settings.OutputPath = Path.Combine(_settings.OutputPath, Path.GetFileName(_settings.InputPath) + "Converted");
+            if (!_settings.OverWriteExistingFiles) //if user choose to not overwrite create a new folder "Input foldername + Coverted" in the output folder to dump all the converted files
+            {
+                _settings.OutputPath = Path.Combine(_settings.OutputPath, Path.GetFileName(_settings.InputPath) + "Converted");
+            }
+            
             if (!Directory.Exists(_settings.OutputPath))
             {
                 Directory.CreateDirectory(_settings.OutputPath);
             }
+
+            
 
             _cancellationTokenSource = new CancellationTokenSource();  // initialize the cancellation token
             _abortImportToken = new CancellationTokenSource();
@@ -201,7 +206,9 @@ namespace Photo_VideoConverter.ViewModel
                     if (cancellationToken.Token.IsCancellationRequested)
                     {
                         // Handle cancellation 
-                        System.IO.Directory.Delete(_settings.OutputPath, recursive: true);  //delete the output folder
+                        if (!_settings.OverWriteExistingFiles) { //chec if we overwrite folder we dont want do delete it
+                            System.IO.Directory.Delete(_settings.OutputPath, recursive: true);  //delete the output folder
+                        }
                         Application.Current.MainWindow.DataContext = new ConvertSettingsViewModel();
                         return; // Exit the loop if cancellation is requested
                     }
@@ -216,21 +223,32 @@ namespace Photo_VideoConverter.ViewModel
                     string Extencsion = Path.GetExtension(File);
                     if (Extencsion == $".{_settings.OutputImageFormat}" || Extencsion == $".{_settings.OutputVideoFormat}") // if file is already in right format we just coppy it
                     {
-                        string CopyFile = Path.Combine(OutputFolder, Path.GetFileName(File));
-                        System.IO.File.Copy(File, CopyFile, true);
+                        if (!_settings.OverWriteExistingFiles) //if user choose to overwrite we dont need to do anythink with file with correct extension
+                        {
+                            string CopyFile = Path.Combine(OutputFolder, Path.GetFileName(File));
+                            System.IO.File.Copy(File, CopyFile, true);
+                        }
                     } else if (Extencsion == ".mp4" || Extencsion == ".avi" || Extencsion == ".mov" || Extencsion == ".mkv" || Extencsion == ".flv" || Extencsion == ".webm" || Extencsion == "mpeg")
                     {
                         await ConvertVideoAsync(File, OutputFolder);
+                        if (_settings.OverWriteExistingFiles) //if converted without errors delete old file
+                        {
+                            System.IO.File.Delete(File);
+                        }
                     }
                     else if (Extencsion == ".png" || Extencsion == ".jpeg" || Extencsion == ".jpg" || Extencsion == ".webp" || Extencsion == ".bmp" || Extencsion == ".gif")
                     {
                         await ConvertImageAsync(File, OutputFolder);
+                        if (_settings.OverWriteExistingFiles)
+                        {
+                            System.IO.File.Delete(File); //if converted without errors delete old file
+                        }
                     }
                     else
                     {
-                        string ErrorMessage = $"\n CONVERT ERROR \nFile: {File} \n -E- Unknow file format";
+                            string ErrorMessage = $"\n CONVERT ERROR \nFile: {File} \n -E- Unknow file format";
                         Exception Error = new Exception(ErrorMessage);
-                        if(!_settings.SkipUnknowExtension)  //user choose to copy unknow extesions to outputfolder
+                        if(!_settings.SkipUnknowExtension && !_settings.OverWriteExistingFiles)  //user choose to copy unknow extesions to outputfolder
                         {
                             string CopyFile = Path.Combine(OutputFolder, Path.GetFileName(File));
                             System.IO.File.Copy(File, CopyFile, true);

@@ -39,15 +39,18 @@
                 </Grid.ColumnDefinitions>
                 <Label FontSize="16">Output settings:</Label>
                 <StackPanel Grid.Row="1" Margin="5">
-                    <Button Width="150" Height="40" HorizontalAlignment="Left" Command="{Binding ChoseOutputFolderCommand}">Chosse output folder</Button>
-                    <TextBlock FontSize="13" Margin="0,5,0,5">Output folder path:</TextBlock>
-                    <TextBlock FontSize="12" Text="{Binding OutputPath}" TextWrapping="Wrap"/>
-                    <Label>What to do with file with unsupported extencion?</Label>
-                    <StackPanel Orientation="Horizontal">
-                        <RadioButton IsChecked="{Binding SkipRadioBtn}">Skip</RadioButton>
-                        <RadioButton Margin="15,0,0,0"> Copy to output folder</RadioButton>
+                    <CheckBox Margin="0,5" IsChecked="{Binding DoNotOverWrite}">Don't overwrite original files – create separate output folder</CheckBox>
+                    <StackPanel Visibility="{Binding OverWrtieSettingsVisibility}">
+                        <Button Width="150" Height="40" HorizontalAlignment="Left" Command="{Binding ChoseOutputFolderCommand}">Chosse output folder</Button>
+                        <TextBlock FontSize="13" Margin="0,5,0,5">Output folder path:</TextBlock>
+                        <TextBlock FontSize="12" Text="{Binding OutputPath}" TextWrapping="Wrap"/>
+                        <Label>What to do with file with unsupported extencion?</Label>
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton IsChecked="{Binding SkipRadioBtn}">Skip</RadioButton>
+                            <RadioButton Margin="15,0,0,0">Copy to output folder</RadioButton>
+                        </StackPanel>
                     </StackPanel>
-                    
+
                 </StackPanel>
                 <StackPanel Grid.Row="1" Grid.Column="1" Margin="5">
                     <Label FontSize="12">Output video format:</Label>

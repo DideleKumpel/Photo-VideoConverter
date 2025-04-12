@@ -16,5 +16,6 @@ namespace Photo_VideoConverter.Model
         public string OutputAudioCodec;
         public string OutputImageFormat;
         public bool SkipUnknowExtension;
+        public bool OverWriteExistingFiles;
     }
 }
