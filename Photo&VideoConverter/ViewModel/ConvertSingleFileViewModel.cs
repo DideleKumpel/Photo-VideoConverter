@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -49,7 +50,7 @@ namespace Photo_VideoConverter.ViewModel
                 OnPropertyChanged(nameof(OutputSaveSettingsVisibility));
             }
         }
-        public  Visibility OutputSaveSettingsVisibility { get; set; }
+        public Visibility OutputSaveSettingsVisibility { get; set; }
 
         private bool _saveCopyInDiffrentLocationSetting;
         public bool SaveCopyInDiffrentLocationSetting
@@ -87,6 +88,7 @@ namespace Photo_VideoConverter.ViewModel
             SaveCopyInDiffrentLocationSetting = false;
 
             SelectInputFileCommand = new RelayCommand(SelectInputFile);
+            SelectOutputFolderCommand = new RelayCommand(SelectOutputFolder);
         }
 
         public void SelectInputFile()
@@ -125,6 +127,15 @@ namespace Photo_VideoConverter.ViewModel
                 Formats.Add("bmp");
             }
             OnPropertyChanged(nameof(Formats));
+        }
+        public void SelectOutputFolder()
+        {
+            var folderDialog = new OpenFolderDialog();
+            if (folderDialog.ShowDialog() == true)
+            {
+                OutputPath = folderDialog.FolderName;
+                OnPropertyChanged(nameof(OutputPath));
+            }
         }
     }
 }

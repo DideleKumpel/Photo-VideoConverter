@@ -47,7 +47,7 @@
                     <StackPanel Visibility="{Binding OutputSaveSettingsVisibility}">
                         <CheckBox Margin="0,5" IsChecked="{Binding SaveCopyInDiffrentLocationSetting}">Save copy in different place</CheckBox>
                         <StackPanel Visibility="{Binding ChoseOutputFileBtnVisibility}">
-                            <Button Width="150" Height="40" HorizontalAlignment="Left" Command="{Binding ChoseOutputFolderCommand}">Chosse output folder</Button>
+                            <Button Width="150" Height="40" HorizontalAlignment="Left" Command="{Binding SelectOutputFolderCommand}">Chosse output folder</Button>
                             <TextBlock FontSize="13" Margin="0,5,0,5">Output folder path:</TextBlock>
                             <TextBlock FontSize="12" Text="{Binding OutputPath}" TextWrapping="Wrap"/>
                         </StackPanel>
