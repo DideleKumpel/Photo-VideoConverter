@@ -15,7 +15,7 @@
         </Grid.RowDefinitions>
         <Border BorderBrush="Black" BorderThickness="1">
             <Grid>
-                <Button Width="100" Height="35" HorizontalAlignment="Left" Margin="10,0,0,0">Back to menu</Button>
+                <Button Width="100" Height="35" HorizontalAlignment="Left" Margin="10,0,0,0" Command="{Binding SwitchToMenuCommand}">Back to menu</Button>
                 <Label FontSize="28" HorizontalAlignment="Center">FILE CONVERT SETTINGS</Label>
             </Grid>
         </Border>

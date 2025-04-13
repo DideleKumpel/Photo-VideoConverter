@@ -101,6 +101,7 @@ namespace Photo_VideoConverter.ViewModel
         public RelayCommand SelectOutputFolderCommand { get; }
         public RelayCommand CancelConvertionCommand { get; }
         public AsyncRelayCommand ConvertCommand { get; }
+        public RelayCommand SwitchToMenuCommand { get; }
 
 
         public ConvertSingleFileViewModel()
@@ -116,6 +117,7 @@ namespace Photo_VideoConverter.ViewModel
             SelectOutputFolderCommand = new RelayCommand(SelectOutputFolder);
             ConvertCommand = new AsyncRelayCommand(StartConvertion, CanStartConvertion);
             CancelConvertionCommand = new RelayCommand(CancelConversion, CanCancelConversion);
+            SwitchToMenuCommand = new RelayCommand(SwitchToMenu, CanSwitchToMenu);
         }
 
         private void SelectInputFile()
@@ -233,6 +235,7 @@ namespace Photo_VideoConverter.ViewModel
             {
                 ConvertingInProgress = true;
                 CancelConvertionCommand.NotifyCanExecuteChanged();
+                SwitchToMenuCommand.NotifyCanExecuteChanged();
                 ConverterProgressStatusVisibility = Visibility.Visible;
                 OnPropertyChanged(nameof(ConverterProgressStatusVisibility));
 
@@ -267,6 +270,7 @@ namespace Photo_VideoConverter.ViewModel
             OnPropertyChanged(nameof(InputPath));
             ConvertCommand.NotifyCanExecuteChanged();
             ConvertingInProgress = false;
+            SwitchToMenuCommand.NotifyCanExecuteChanged();
             CancelConvertionCommand.NotifyCanExecuteChanged();
         }
 
@@ -434,6 +438,15 @@ namespace Photo_VideoConverter.ViewModel
         private bool CanCancelConversion()
         {
             return ConvertingInProgress;
+        }
+
+        private void SwitchToMenu()
+        {
+            Application.Current.MainWindow.DataContext = new MainMenuViewModel();
+        }
+        private bool CanSwitchToMenu()
+        {
+            return !ConvertingInProgress;
         }
     }
 }
