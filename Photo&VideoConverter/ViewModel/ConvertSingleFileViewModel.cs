@@ -13,6 +13,7 @@ using NReco.VideoConverter;
 using System.IO;
 using System.Runtime;
 using SixLabors.ImageSharp;
+using System.Threading;
 
 namespace Photo_VideoConverter.ViewModel
 {
@@ -90,19 +91,31 @@ namespace Photo_VideoConverter.ViewModel
         public string ErrorMessage { get; set; }
         public Visibility ErrorMessageVisibility { get; set; }
 
+        public Visibility ConverterProgressStatusVisibility { get; set; }
+        public double ProgressIndycator { get; set; }
+
+        private bool ConvertingInProgress { get; set; }
+
         //COMMANDS
         public RelayCommand SelectInputFileCommand { get; }
         public RelayCommand SelectOutputFolderCommand { get; }
+        public RelayCommand CancelConvertionCommand { get; }
         public AsyncRelayCommand ConvertCommand { get; }
+
 
         public ConvertSingleFileViewModel()
         {
             OverwriteSettings = true;
             SaveCopyInDiffrentLocationSetting = false;
 
+
+            ConverterProgressStatusVisibility = Visibility.Collapsed;
+            ConvertingInProgress = false;
+
             SelectInputFileCommand = new RelayCommand(SelectInputFile);
             SelectOutputFolderCommand = new RelayCommand(SelectOutputFolder);
             ConvertCommand = new AsyncRelayCommand(StartConvertion, CanStartConvertion);
+            CancelConvertionCommand = new RelayCommand(CancelConversion, CanCancelConversion);
         }
 
         private void SelectInputFile()
@@ -161,7 +174,7 @@ namespace Photo_VideoConverter.ViewModel
             _convertSettings.InputPath = InputPath;
             if (!SaveCopyInDiffrentLocationSetting || OverwriteSettings)   //if user save file in the same location or overwrite it
             {
-                _convertSettings.OutputPath = Path.GetDirectoryName( InputPath);
+                _convertSettings.OutputPath = Path.GetDirectoryName(InputPath);
             }
             else
             {
@@ -218,6 +231,11 @@ namespace Photo_VideoConverter.ViewModel
             }
             try
             {
+                ConvertingInProgress = true;
+                CancelConvertionCommand.NotifyCanExecuteChanged();
+                ConverterProgressStatusVisibility = Visibility.Visible;
+                OnPropertyChanged(nameof(ConverterProgressStatusVisibility));
+
                 if (IsVideo)
                 {
                     Converter = new FFMpegConverter();
@@ -240,13 +258,16 @@ namespace Photo_VideoConverter.ViewModel
             catch (Exception ex)
             {
                 MessageBox.Show($"Error occured while converting file.\n{ex.Message}");
+                ConvertingInProgress = false;
+                CancelConvertionCommand.NotifyCanExecuteChanged();
                 return;
             }
             MessageBox.Show("Convertion complete.");
             InputPath = null;
             OnPropertyChanged(nameof(InputPath));
             ConvertCommand.NotifyCanExecuteChanged();
-
+            ConvertingInProgress = false;
+            CancelConvertionCommand.NotifyCanExecuteChanged();
         }
 
         private bool CanStartConvertion()
@@ -267,7 +288,7 @@ namespace Photo_VideoConverter.ViewModel
             }
             if (SaveCopyInDiffrentLocationSetting)
             {
-                if(OutputPath == null || OutputPath == "none")
+                if (OutputPath == null || OutputPath == "none")
                 {
                     CanConvert = false;
                     if (string.IsNullOrEmpty(Errors))
@@ -318,7 +339,7 @@ namespace Photo_VideoConverter.ViewModel
                 await Task.Run(() =>
                 {
 
-                    //Converter.ConvertProgress += HandleConversionProgress;      //assing metod to event to track progress of file convertion
+                    Converter.ConvertProgress += HandleConversionProgress;      //assing metod to event to track progress of file convertion
 
 
                     Converter.ConvertMedia(inputFilePath, null, outputFilePath, _convertSettings.OutputVideoFormat, ConverterSetting);
@@ -387,6 +408,32 @@ namespace Photo_VideoConverter.ViewModel
             var image = await Image.LoadAsync(inputFilePath);
             await image.SaveAsync(outputFilePath);
             image.Dispose(); // Dispose of the image to free up resources
+        }
+
+        private void HandleConversionProgress(object sender, ConvertProgressEventArgs args)
+        {
+            ProgressIndycator = (args.Processed.TotalSeconds / args.TotalDuration.TotalSeconds) * 100;
+            OnPropertyChanged(nameof(ProgressIndycator));
+        }
+
+        private void CancelConversion()
+        {
+            // Logic to cancel the conversion process
+            var CovertsionComformation = MessageBox.Show(
+                        "Are you sure you want to cancel the conversion?",
+                        "",
+                         MessageBoxButton.YesNo,
+                        MessageBoxImage.Information);
+            if (CovertsionComformation == MessageBoxResult.No)
+            {
+                return;
+            }
+            Converter.Stop();
+        }
+
+        private bool CanCancelConversion()
+        {
+            return ConvertingInProgress;
         }
     }
 }
