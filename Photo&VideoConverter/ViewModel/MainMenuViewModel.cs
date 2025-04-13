@@ -27,8 +27,7 @@ namespace Photo_VideoConverter.ViewModel
         }
         private void SwitchToConvertSingleFile()
         {
-            // Logic to switch to ConvertSingleFileViewModel
-            //to do when start working on the ConvertSingleFileViewModel
+            Application.Current.MainWindow.DataContext = new ConvertSingleFileViewModel();
         }
 
 
