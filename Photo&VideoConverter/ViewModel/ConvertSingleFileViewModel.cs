@@ -8,11 +8,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using Photo_VideoConverter.Model;
+using NReco.VideoConverter;
+using System.IO;
+using System.Runtime;
+using SixLabors.ImageSharp;
 
 namespace Photo_VideoConverter.ViewModel
 {
     internal class ConvertSingleFileViewModel : ObservableObject
     {
+        private ConverterSettingsModel _convertSettings;
+        private FFMpegConverter Converter;
+        private ConvertSettings ConverterSetting;
+
         public string InputPath { get; set; }
         public string OutputPath { get; set; }
 
@@ -147,6 +156,96 @@ namespace Photo_VideoConverter.ViewModel
 
         private async Task StartConvertion()
         {
+            _convertSettings = new ConverterSettingsModel();
+            _convertSettings.OverWriteExistingFiles = OverwriteSettings;
+            _convertSettings.InputPath = InputPath;
+            if (!SaveCopyInDiffrentLocationSetting || OverwriteSettings)   //if user save file in the same location or overwrite it
+            {
+                _convertSettings.OutputPath = Path.GetDirectoryName( InputPath);
+            }
+            else
+            {
+                _convertSettings.OutputPath = OutputPath;
+            }
+
+            bool IsVideo = false;
+            if (InputPath.EndsWith(".mp4") || InputPath.EndsWith(".avi") || InputPath.EndsWith(".mov") || InputPath.EndsWith(".flv") || InputPath.EndsWith(".mpeg"))
+            {
+                IsVideo = true;
+                _convertSettings.OutputVideoFormat = SelectedFormat;
+                switch (_convertSettings.OutputVideoFormat)  //setting up codecs for viedo format
+                {
+                    case "mp4":
+                        _convertSettings.OutputVideoCodec = "h264";
+                        _convertSettings.OutputAudioCodec = "ac3";
+                        break;
+                    case "avi":
+                        _convertSettings.OutputVideoCodec = "h264";
+                        _convertSettings.OutputAudioCodec = "ac3";
+                        break;
+                    case "mov":
+                        _convertSettings.OutputVideoCodec = "h264";
+                        _convertSettings.OutputAudioCodec = "mp3";
+                        break;
+                    case "flv":
+                        _convertSettings.OutputVideoCodec = "h264";
+                        _convertSettings.OutputAudioCodec = "mp3";
+                        break;
+                    case "mpeg":
+                        _convertSettings.OutputVideoCodec = "mpeg2video";
+                        _convertSettings.OutputAudioCodec = "mp2";
+                        break;
+                    default:
+                        MessageBox.Show("Error occured while setting codecs try \nagain or select different video input format.");
+                        return;
+                }
+            }
+            else if (InputPath.EndsWith(".png") || InputPath.EndsWith(".jpg") || InputPath.EndsWith(".webp") || InputPath.EndsWith(".bmp"))
+            {
+                IsVideo = false;
+                _convertSettings.OutputImageFormat = SelectedFormat;
+            }
+            else
+            {
+                MessageBox.Show("Error occured while setting formats try \nagain or select different file.");
+                return;
+            }
+            string Extension = System.IO.Path.GetExtension(InputPath);
+            if (Extension == $".{SelectedFormat}")
+            {
+                MessageBox.Show("Input and output formats are the same.\nPlease select different output format.");
+                return;
+            }
+            try
+            {
+                if (IsVideo)
+                {
+                    Converter = new FFMpegConverter();
+                    //set up converter settings
+                    ConverterSetting = new ConvertSettings();
+                    //setting up out put viedo and audio codec
+                    ConverterSetting.VideoCodec = _convertSettings.OutputVideoCodec;
+                    ConverterSetting.AudioCodec = _convertSettings.OutputAudioCodec;
+                    await ConvertVideoAsync(InputPath, _convertSettings.OutputPath);
+                }
+                else
+                {
+                    await ConvertImageAsync(InputPath, _convertSettings.OutputPath);
+                }
+                if (_convertSettings.OverWriteExistingFiles)
+                {
+                    System.IO.File.Delete(_convertSettings.InputPath); //if converted without errors delete old file
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error occured while converting file.\n{ex.Message}");
+                return;
+            }
+            MessageBox.Show("Convertion complete.");
+            InputPath = null;
+            OnPropertyChanged(nameof(InputPath));
+            ConvertCommand.NotifyCanExecuteChanged();
 
         }
 
@@ -208,5 +307,86 @@ namespace Photo_VideoConverter.ViewModel
             return CanConvert;
         }
 
+
+        private async Task ConvertVideoAsync(string inputFilePath, string outputDirectory)
+        {
+            try
+            {
+                string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(inputFilePath);
+
+                string outputFilePath = Path.Combine(outputDirectory, (fileNameWithoutExtension + "." + _convertSettings.OutputVideoFormat));
+                await Task.Run(() =>
+                {
+
+                    //Converter.ConvertProgress += HandleConversionProgress;      //assing metod to event to track progress of file convertion
+
+
+                    Converter.ConvertMedia(inputFilePath, null, outputFilePath, _convertSettings.OutputVideoFormat, ConverterSetting);
+                });
+            }
+            catch (FFMpegException ex)
+            {
+                Console.WriteLine("CONVERT ERROR");
+                Console.WriteLine($"File: {inputFilePath}");
+                Console.WriteLine($"FFmpeg error : {ex.Message}");
+                string ErrorMessage = $"\n CONVERT ERROR \nFile: {inputFilePath} \n -E- FFmpeg error : {ex.Message}";
+                Exception Error = new Exception(ErrorMessage);
+                throw Error;
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.WriteLine("CONVERT ERROR");
+                Console.WriteLine($"File: {inputFilePath}");
+                Console.WriteLine("E- File not found");
+                string ErrorMessage = $"\n CONVERT ERROR \nFile: {inputFilePath} \n -E- File not found";
+                Exception Error = new Exception(ErrorMessage);
+                throw Error;
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                Console.WriteLine("CONVERT ERROR");
+                Console.WriteLine($"File: {inputFilePath}");
+                Console.WriteLine($"E- Directory not found: {ex.Message}");
+                string ErrorMessage = $"\n CONVERT ERROR \nFile: {inputFilePath} \n -E- Directory not found: {ex.Message}";
+                Exception Error = new Exception(ErrorMessage);
+                throw Error;
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Console.WriteLine("CONVERT ERROR");
+                Console.WriteLine($"File: {inputFilePath}");
+                Console.WriteLine($"E- Acces denied: {ex.Message}");
+                string ErrorMessage = $"\n CONVERT ERROR \nFile: {inputFilePath} \n -E- Acces denied: {ex.Message}";
+                Exception Error = new Exception(ErrorMessage);
+                throw Error;
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine("CONVERT ERROR");
+                Console.WriteLine($"File: {inputFilePath}");
+                Console.WriteLine($"E- IO error: {ex.Message}");
+                string ErrorMessage = $"\n CONVERT ERROR \nFile: {inputFilePath} \n -E- IO error: {ex.Message}";
+                Exception Error = new Exception(ErrorMessage);
+                throw Error;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("CONVERT ERROR");
+                Console.WriteLine($"File: {inputFilePath}");
+                Console.WriteLine($"E- Unexpected error: {ex.Message}");
+                string ErrorMessage = $"\n CONVERT ERROR \nFile: {inputFilePath} \n -E- Unexpected error: {ex.Message}";
+                Exception Error = new Exception(ErrorMessage);
+                throw Error;
+            }
+        }
+        private async Task ConvertImageAsync(string inputFilePath, string outputDirectory)
+        {
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(inputFilePath);
+            string outputFilePath = Path.Combine(outputDirectory, (fileNameWithoutExtension + "." + _convertSettings.OutputImageFormat));
+
+            var image = await Image.LoadAsync(inputFilePath);
+            await image.SaveAsync(outputFilePath);
+            image.Dispose(); // Dispose of the image to free up resources
+        }
     }
 }
